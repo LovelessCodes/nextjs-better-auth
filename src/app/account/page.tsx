@@ -1,11 +1,9 @@
-"use client";
-
 import RootLayout from "@/layouts/root-layout";
 
-export default function Home() {
+export default function Account() {
 	return (
 		<RootLayout>
-			<div>Hi there!</div>
+			<div>Account</div>
 		</RootLayout>
 	);
 }
