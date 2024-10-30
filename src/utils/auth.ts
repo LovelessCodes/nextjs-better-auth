@@ -6,7 +6,8 @@ import * as schema from "../../auth-schema";
 
 const db = drizzle({
 	connection: {
-		url: "file:data.db",
+		url: process.env.TURSO_DB_URL ?? "file:data.db",
+		authToken: process.env.TURSO_DB_AUTH_TOKEN ?? "",
 	},
 });
 
