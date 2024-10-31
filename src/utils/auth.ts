@@ -18,7 +18,10 @@ export const auth = betterAuth({
 			...schema,
 		},
 	}),
-	trustedOrigins: [process.env.NEXT_PUBLIC_URL as string],
+	trustedOrigins: [
+		process.env.NEXT_PUBLIC_URL as string,
+		...(process.env.ALLOWED_ORIGINS?.split(",") ?? []),
+	],
 	socialProviders: {
 		google: {
 			clientId: process.env.GOOGLE_CLIENT_ID as string,
