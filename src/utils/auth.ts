@@ -1,6 +1,8 @@
+import { expo } from "@better-auth/expo";
 import { betterAuth } from "better-auth";
 
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { multiSession } from "better-auth/plugins";
 import { drizzle } from "drizzle-orm/libsql";
 import * as schema from "../../auth-schema";
 
@@ -28,4 +30,5 @@ export const auth = betterAuth({
 			clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
 		},
 	},
+	plugins: [multiSession(), expo()],
 });

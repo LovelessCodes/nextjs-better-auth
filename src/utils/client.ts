@@ -1,4 +1,8 @@
 import { createAuthClient } from "better-auth/client";
-export const { signIn, signOut, signUp, getSession } = createAuthClient({
-	baseURL: process.env.NEXT_PUBLIC_URL as string,
-});
+import { multiSessionClient } from "better-auth/client/plugins";
+
+export const { signIn, signOut, signUp, getSession, multiSession } =
+	createAuthClient({
+		baseURL: process.env.NEXT_PUBLIC_URL as string,
+		plugins: [multiSessionClient()],
+	});
