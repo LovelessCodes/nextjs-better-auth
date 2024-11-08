@@ -11,7 +11,7 @@
 		"prepare": "husky"
 	},
 	"dependencies": {
-		"@better-auth/expo": "0.7.1-beta.6",
+		"@better-auth/expo": "0.7.5",
 		"@libsql/client": "^0.14.0",
 		"@libsql/kysely-libsql": "^0.4.1",
 		"@radix-ui/react-avatar": "^1.1.1",
