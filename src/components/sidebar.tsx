@@ -2,16 +2,18 @@
 
 import { useUser } from "@/hooks/use-user";
 import { useUsers } from "@/hooks/use-users";
-import { signOut } from "@/utils/client";
+import { signIn, signOut } from "@/utils/client";
+import { useQueryClient } from "@tanstack/react-query";
 import {
 	CheckCircle2,
 	ChevronDown,
 	ChevronsLeftRight,
 	DoorOpen,
+	User2,
 	X,
 } from "lucide-react";
 import dynamic from "next/dynamic";
-import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
 import {
@@ -37,7 +39,7 @@ const ThemeToggle = dynamic(() => import("./theme-toggle"), { ssr: false });
 export function AppSidebar() {
 	const { user } = useUser();
 	const { users } = useUsers();
-	const router = useRouter();
+	const queryClient = useQueryClient();
 
 	return (
 		<Sidebar side="left" variant="sidebar" collapsible="icon">
@@ -102,60 +104,89 @@ export function AppSidebar() {
 			<SidebarContent />
 			<SidebarFooter>
 				<SidebarMenu>
-					<SidebarMenuItem>
-						<Popover>
-							<PopoverTrigger asChild>
-								<SidebarMenuButton className="h-fit">
-									<div className="flex items-center gap-2">
+					{user ? (
+						<SidebarMenuItem>
+							<Popover>
+								<PopoverTrigger asChild>
+									<SidebarMenuButton className="h-fit">
+										<div className="flex items-center gap-2">
+											<Avatar className="w-8 h-8">
+												<AvatarImage src={user?.image} alt={user?.name} />
+												<AvatarFallback>{user?.name.charAt(0)}</AvatarFallback>
+											</Avatar>
+											<div className="flex flex-col items-start">
+												<p>{user?.name}</p>
+												<p className="opacity-50">{user?.email}</p>
+											</div>
+										</div>
+										<ChevronsLeftRight className="ml-auto" />
+									</SidebarMenuButton>
+								</PopoverTrigger>
+								<PopoverContent
+									side="right"
+									sideOffset={8}
+									className="p-0 rounded-l-none"
+								>
+									<div className="flex items-center gap-2 p-1">
 										<Avatar className="w-8 h-8">
 											<AvatarImage src={user?.image} alt={user?.name} />
 											<AvatarFallback>{user?.name.charAt(0)}</AvatarFallback>
 										</Avatar>
 										<div className="flex flex-col items-start">
 											<p>{user?.name}</p>
-											<p className="opacity-50">{user?.email}</p>
+											<div className="flex items-center gap-2">
+												<p className="opacity-50">{user?.email}</p>
+												{user?.emailVerified ? (
+													<CheckCircle2 className="w-4 h-4 text-green-500" />
+												) : (
+													<X className="w-4 h-4 text-red-500" />
+												)}
+											</div>
 										</div>
 									</div>
-									<ChevronsLeftRight className="ml-auto" />
-								</SidebarMenuButton>
-							</PopoverTrigger>
-							<PopoverContent
-								side="right"
-								sideOffset={8}
-								className="p-0 rounded-l-none"
+									<Separator />
+									<div className="flex flex-col gap-2 p-1">
+										<Button
+											variant="ghost"
+											size="icon"
+											className="w-full flex items-center"
+											onClick={() =>
+												signOut({
+													fetchOptions: {
+														onSuccess: () => {
+															queryClient.invalidateQueries({
+																queryKey: ["user"],
+															});
+															toast.success("Signed out successfully");
+														},
+													},
+												})
+											}
+										>
+											<DoorOpen className="w-4 h-4" />
+											<p>Sign Out</p>
+										</Button>
+									</div>
+								</PopoverContent>
+							</Popover>
+						</SidebarMenuItem>
+					) : (
+						<SidebarMenuItem>
+							<Button
+								variant="ghost"
+								size="icon"
+								className="w-full flex items-center"
+								onClick={() =>
+									signIn.social({
+										provider: "google",
+									})
+								}
 							>
-								<div className="flex items-center gap-2 p-1">
-									<Avatar className="w-8 h-8">
-										<AvatarImage src={user?.image} alt={user?.name} />
-										<AvatarFallback>{user?.name.charAt(0)}</AvatarFallback>
-									</Avatar>
-									<div className="flex flex-col items-start">
-										<p>{user?.name}</p>
-										<div className="flex items-center gap-2">
-											<p className="opacity-50">{user?.email}</p>
-											{user?.emailVerified ? (
-												<CheckCircle2 className="w-4 h-4 text-green-500" />
-											) : (
-												<X className="w-4 h-4 text-red-500" />
-											)}
-										</div>
-									</div>
-								</div>
-								<Separator />
-								<div className="flex flex-col gap-2 p-1">
-									<Button
-										variant="ghost"
-										size="icon"
-										className="w-full flex items-center"
-										onClick={() => signOut()}
-									>
-										<DoorOpen className="w-4 h-4" />
-										<p>Sign Out</p>
-									</Button>
-								</div>
-							</PopoverContent>
-						</Popover>
-					</SidebarMenuItem>
+								<User2 className="w-4 h-4" />
+								<p>Sign In with Google</p>
+							</Button>
+						</SidebarMenuItem>
+					)}
 				</SidebarMenu>
 			</SidebarFooter>
 		</Sidebar>
